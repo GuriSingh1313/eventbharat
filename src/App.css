@@ -454,3 +454,12 @@ body {
 .nav-btn span { font-size: 10px; }
 
 .screen { min-height: 100vh; }
+/* DESKTOP — bottom nav hide kar, koi overlap nahi */
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+  .app {
+    padding-bottom: 40px;
+  }
+}
