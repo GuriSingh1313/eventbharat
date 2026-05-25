@@ -76,7 +76,32 @@ function App() {
   return (
     <div className="app">
       {toast.show && <div className={`toast ${toast.type}`}>{toast.msg}</div>}
-
+{/* Top navigation - laptop pe Home/Tickets/Profile */}
+      <div className="top-nav">
+        <div className="top-nav-brand" onClick={() => setScreen('home')}>
+          Event<span>Bharat</span>
+        </div>
+        <div className="top-nav-links">
+          <button 
+            className={`top-nav-btn ${screen==='home'?'active':''}`}
+            onClick={() => setScreen('home')}>
+            🏠 Home
+          </button>
+          <button 
+            className={`top-nav-btn ${screen==='tickets'?'active':''}`}
+            onClick={() => {
+              if(!user) { setScreen('login'); showToast('Please login first','error'); return }
+              setScreen('tickets')
+            }}>
+            🎟️ Tickets
+          </button>
+          <button 
+            className={`top-nav-btn ${screen==='profile'?'active':''}`}
+            onClick={() => setScreen('profile')}>
+            👤 Profile
+          </button>
+        </div>
+      </div>
       {screen === 'home' && <HomeScreen 
         events={filteredEvents} 
         search={search} setSearch={setSearch}
