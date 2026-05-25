@@ -431,11 +431,11 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 600px;
-  background: rgba(20,20,22,0.95);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid #2a2830;
+  background: #0d0d0f;
+  border-top: 2px solid #2a2830;
   display: flex;
   z-index: 100;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
 }
 .nav-btn {
   flex: 1;
