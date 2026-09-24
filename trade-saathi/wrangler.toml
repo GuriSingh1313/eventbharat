@@ -1,0 +1,11 @@
+# Sirf LOCAL development ke liye (npm run pages:dev).
+# Isme jaan-boojhkar "pages_build_output_dir" nahi hai, taaki Cloudflare Pages is file ko
+# ignore kare aur Dashboard wali settings (D1 binding "DB", secrets) use kare. SETUP.md dekho.
+name = "trade-saathi"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "trade_saathi"
+database_id = "local-only"
+migrations_dir = "migrations"

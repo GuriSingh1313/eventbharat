@@ -1,0 +1,32 @@
+# Trade Saathi alerts: every 15 min, Mon–Fri, 9:15 AM – 3:35 PM IST (+ a 4:00 PM backup for the daily summary).
+# GitHub cron is in UTC: IST = UTC + 5:30. Holidays / "no candle today" are skipped by the server.
+name: Trade Saathi alerts
+
+on:
+  schedule:
+    - cron: '45 3 * * 1-5'            # 09:15 IST
+    - cron: '0,15,30,45 4-9 * * 1-5'  # 09:30 – 15:15 IST
+    - cron: '0,5 10 * * 1-5'          # 15:30, 15:35 IST (daily summary)
+    - cron: '30 10 * * 1-5'           # 16:00 IST backup, in case GitHub delays
+  workflow_dispatch: {}
+
+concurrency:
+  group: trade-saathi-alerts
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Call /api/alerts/run
+        env:
+          APP_URL: ${{ secrets.TS_APP_URL }}
+          CRON_SECRET: ${{ secrets.TS_CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then echo "Secrets TS_APP_URL / TS_CRON_SECRET missing"; exit 1; fi
+          for i in 1 2 3; do
+            code=$(curl -sS -o out.json -w '%{http_code}' -X POST -H "x-cron-secret: $CRON_SECRET" "$APP_URL/api/alerts/run") && [ "$code" = "200" ] && { cat out.json; exit 0; }
+            echo "attempt $i failed ($code)"; sleep $((i * 10))
+          done
+          cat out.json || true; exit 1
