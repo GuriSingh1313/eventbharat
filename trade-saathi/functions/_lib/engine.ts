@@ -1,6 +1,7 @@
 // Alert engine: shared by /api/alerts/run (cron) — evaluates rules, dedupes per IST day, sends Telegram.
 import { evaluateRules, type AlertRule, type Fired } from '../../src/lib/alerts';
-import { inr, istParts, istTime, pct } from '../../src/lib/format';
+import { istParts } from '../../src/lib/format';
+import { summaryText } from '../../src/lib/summary';
 import { CLOSE_MIN, OPEN_MIN } from '../../src/lib/market';
 import { holdingCalc, portfolioCalc } from '../../src/lib/money';
 import type { Env } from './env';
@@ -58,17 +59,4 @@ export async function runAlerts(env: Env, now = new Date(), opts: { force?: bool
     sent.push(f.message);
   }
   return { sent, checked: rules.length, summary: toSend.some((f) => f.key === 'daily_summary') };
-}
-
-function summaryText(holdings: HoldingRow[], quotes: Record<string, QuoteOut>, port: ReturnType<typeof portfolioCalc>, now: Date): string {
-  const lines = holdings
-    .map((h) => {
-      const q = quotes[h.symbol];
-      if (!q) return `• ${h.symbol}: data nahi mila`;
-      const c = holdingCalc({ qty: h.qty, avgPrice: h.avg_price }, q);
-      return `• ${h.symbol} ${inr(q.ltp)} (aaj ${pct(c.dayPct)}) · P&L ${inr(c.pnl, { sign: true })}`;
-    })
-    .join('\n');
-  const green = holdings.some((h) => !quotes[h.symbol]) ? 'Kuch stocks ka price nahi mila — total adhoora hai.' : port.neededForGreenPct > 0 ? `Green hone ke liye ${port.neededForGreenPct.toFixed(1)}% aur chahiye.` : 'Portfolio green hai 🟢';
-  return `📊 Aaj ka haal (${istTime(now)} IST)\n\nAaj: ${inr(port.dayChange, { sign: true })} (${pct(port.dayPct)})\nKul P&L: ${inr(port.pnl, { sign: true })} (${pct(port.pnlPct)})\nValue: ${inr(port.value)} / Lagaya: ${inr(port.invested)}\n${green}\n\n${lines}\n\nData thoda late ho sakta hai. Salah nahi, sirf jaankari.`;
 }

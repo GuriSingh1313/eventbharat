@@ -11,7 +11,8 @@
     "e2e": "playwright test",
     "db:migrate:local": "wrangler d1 migrations apply trade_saathi --local",
     "db:seed:local": "wrangler d1 execute trade_saathi --local --file=seed/seed.sql",
-    "pages:dev": "wrangler pages dev dist"
+    "pages:dev": "wrangler pages dev dist",
+    "build:vercel": "tsc --noEmit && VITE_BACKEND=local vite build --base=/trade-saathi/ --outDir ../public/trade-saathi --emptyOutDir && rm -f ../public/trade-saathi/_headers"
   },
   "dependencies": {
     "preact": "^10.24.0"
