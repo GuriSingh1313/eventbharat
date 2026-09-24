@@ -21,6 +21,8 @@ async function enterPin(page: Page) {
 
 async function login(page: Page) {
   await mockQuotes(page);
+  // The first-launch "Add to Home Screen" sheet opens asynchronously after login; mark it seen so it can't cover the tab bar.
+  await page.addInitScript(() => localStorage.setItem('ts:installSeen', '1'));
   await page.goto('/');
   const heading = page.getByRole('heading', { level: 1 });
   await expect(heading).toBeVisible();
@@ -32,8 +34,6 @@ async function login(page: Page) {
     await enterPin(page); await page.getByRole('button', { name: 'Kholo' }).click();
   }
   await expect(page.getByRole('heading', { name: 'Aaj ka haal' })).toBeVisible();
-  const close = page.getByRole('button', { name: 'Samajh gayi' });
-  if (await close.isVisible().catch(() => false)) await close.click();
 }
 
 test('home shows portfolio totals in Indian format', async ({ page }) => {
