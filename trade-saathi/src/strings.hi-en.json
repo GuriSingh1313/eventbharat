@@ -1,1 +1,95 @@
-{}
+{
+  "app": { "name": "Trade Saathi", "tagline": "Aapka shaant, samajhdaar trading dost" },
+  "tabs": { "home": "Aaj", "holdings": "Holdings", "order": "Order Card", "alerts": "Alerts", "settings": "Settings" },
+  "common": {
+    "save": "Save karo", "cancel": "Rehne do", "delete": "Hatao", "edit": "Badlo", "add": "Jodo", "close": "Band karo",
+    "copy": "Copy", "copied": "Copy ho gaya ✓", "loading": "Ek second…", "retry": "Dobara try karo",
+    "whatIsThis": "ye kya hai?", "lastUpdated": "Last update: {time} IST", "stale": "Data thoda late hai",
+    "offline": "Internet nahi mil raha — purana data dikha rahe hain", "error": "Kuch gadbad ho gayi: {msg}",
+    "confirmDelete": "Pakka hatana hai?", "yes": "Haan", "no": "Nahi", "next": "Aage", "back": "Peeche", "done": "Ho gaya"
+  },
+  "market": { "open": "Market khula hai", "pre-open": "Pre-open", "closed": "Market band hai", "holiday": "Aaj chhutti hai", "weekend": "Weekend — market band" },
+  "pin": {
+    "setTitle": "Apna PIN banao", "setHint": "4 se 6 number. Ye app sirf aap khol sakogi.",
+    "confirmTitle": "PIN dobara daalo", "mismatch": "Dono PIN alag hain, phir se try karo",
+    "enterTitle": "PIN daalo", "enterHint": "Trade Saathi kholne ke liye", "go": "Kholo"
+  },
+  "home": {
+    "title": "Aaj ka haal", "invested": "Lagaya", "current": "Abhi ki value", "totalPnl": "Kul faayda / nuksaan", "today": "Aaj",
+    "needGreen": "Green hone ke liye {pct} aur chahiye", "isGreen": "Portfolio green hai 🟢 Badhai!",
+    "empty": "Abhi koi stock nahi hai.", "emptyCta": "Pehla stock jodo", "pull": "Neeche kheecho refresh ke liye",
+    "movers": "Aaj ke bade move", "partial": "Kuch stocks ka price abhi nahi mila, isliye total adhoora hai. Thodi der mein refresh karo.",
+    "calm": "Yaad rakho: roz ka upar-neeche normal hai. Plan pe tike raho. 🙏"
+  },
+  "holdings": {
+    "title": "Holdings", "add": "Stock jodo", "import": "CSV se laao", "qty": "Qty", "avg": "Avg price", "ltp": "Abhi",
+    "pnl": "P&L", "day": "Aaj", "short": "Short-term", "long": "Long-term", "unknownPeriod": "Buy date nahi",
+    "name": "Naam", "symbol": "NSE symbol", "symbolHint": "Naam ya symbol likho, jaise Infosys", "buyDate": "Kharidne ki date",
+    "broker": "Broker", "danger": "Khatre ka price", "dangerHint": "Is price ke neeche aaya toh alert aayega",
+    "empty": "Koi holding nahi. Upar se stock jodo ya CSV import karo.", "noQuote": "Price nahi mila",
+    "held": "{days} din se",
+    "importTitle": "CSV import", "importHint": "Groww ya Upstox app se Holdings ki CSV/Excel file download karke yahan chuno.",
+    "pickFile": "File chuno", "mapTitle": "Columns milao", "mapHint": "Kaunsa column kya hai, bata do:",
+    "preview": "{n} stocks mile. Symbol check kar lo:", "importAdd": "Jodo (purane rakho)", "importReplace": "Sab badlo",
+    "imported": "{n} stocks import ho gaye ✓", "needSymbol": "Har row ka NSE symbol bharna zaroori hai"
+  },
+  "order": {
+    "title": "Order Card", "sub": "Broker app mein yahi bharna hai — order aap khud lagaogi.",
+    "pick": "Stock chuno", "intent": "Kya karna hai?",
+    "intents": { "sell": "Bechna", "buy": "Kharidna", "stoploss": "Stop-loss lagana", "target": "Target pe bechna" },
+    "ltp": "Abhi ka price", "trigger": "Trigger price", "limit": "Limit price", "price": "Price", "qty": "Quantity",
+    "target": "Target (sirf hisaab ke liye)", "card": "Broker app mein ye bharo",
+    "pnlAtExit": "Is price par bika toh", "pnlAtTarget": "Target par", "charges": "Brokerage/tax alag se lagega.",
+    "fixErrors": "Pehle ye theek karo:", "careful": "Dhyan do:", "never": "Ye app kabhi order nahi lagati. Aap broker app mein khud lagao.",
+    "noStock": "Pehle Holdings mein stock jodo, ya symbol likho."
+  },
+  "alerts": {
+    "title": "Alerts", "add": "Alert jodo", "kinds": {
+      "above": "Price upar gaya", "below": "Price neeche aaya", "day_move": "Ek din mein % move",
+      "danger": "Khatre ka price", "buy_level": "Kharidne ka level", "portfolio_green": "Portfolio green hua"
+    },
+    "value": "Price (₹)", "valuePct": "Kitna % move", "label": "Note (jaise Part 1 of 3)",
+    "empty": "Koi alert nahi.", "off": "Band", "on": "Chalu",
+    "telegram": "Telegram setup", "telegramOk": "Telegram jud gaya ✓", "telegramNo": "Telegram abhi juda nahi — alerts phone pe nahi aayenge",
+    "history": "Haal ke alerts", "checkNow": "Abhi check karo (test)", "summaryNote": "Roz 3:35 PM ko din ka summary Telegram pe aayega."
+  },
+  "tg": {
+    "s1t": "Bot banao", "s1": "Telegram kholo → search mein \"BotFather\" likho (blue tick wala) → \"Start\" dabao → /newbot bhejo → naam do (jaise Guri Trade Saathi) → username do jo \"bot\" pe khatam ho.",
+    "s2t": "Token copy karo", "s2": "BotFather ek lamba token dega jaise 123456789:ABC-xyz… Use lamba dabake copy karo aur neeche paste karo.",
+    "s3t": "Bot ko Start karo", "s3": "BotFather ke message mein aapke bot ka link (t.me/…) hoga. Use kholo aur \"Start\" dabao. Ghar ke jis member ko bhi alert chahiye, woh bhi yahi kare.",
+    "s4t": "Chat dhoondho", "s4": "Neeche button dabao — jinhone Start dabaya unke naam dikhenge. Sab pe tick karo aur save karo.",
+    "tokenPh": "Token yahan paste karo", "detect": "Chat dhoondho", "none": "Koi chat nahi mila. Bot kholkar \"Start\" dabao ya \"hi\" bhejo, phir dobara try karo.",
+    "saveIds": "Save karo", "test": "Test message bhejo", "testOk": "Message chala gaya! Telegram check karo ✓", "shot": "(screenshot yahan)"
+  },
+  "settings": {
+    "title": "Settings", "pin": "PIN badlo", "oldPin": "Purana PIN", "newPin": "Naya PIN", "pinChanged": "PIN badal gaya ✓",
+    "chatIds": "Telegram chat IDs", "dangerDefault": "Naye stock ka khatre ka level (abhi ke price se % neeche)",
+    "colors": "Rang", "colorsNormal": "Hara / Laal", "colorsCb": "Neela / Naranga (colour-blind safe)",
+    "holidays": "Market chhutti ki list", "addHoliday": "Chhutti jodo",
+    "backup": "Backup", "export": "Sara data download karo (JSON)", "importJson": "Backup file se wapas laao", "restored": "Data wapas aa gaya ✓",
+    "install": "Home Screen pe kaise lagaye", "logout": "Logout",
+    "about": "About", "aboutText": "Trade Saathi ek personal tool hai. Ye koi investment advice nahi hai, na hi SEBI registered advisor. Ye kabhi order nahi lagata aur broker login nahi maangta. Prices Yahoo Finance se aate hain aur late ho sakte hain. Faisla hamesha aapka.",
+    "version": "Version {v}"
+  },
+  "install": {
+    "title": "Trade Saathi ko Home Screen pe lagao",
+    "s1": "Safari mein neeche Share button (⬆️ wala dabba) dabao",
+    "s2": "Neeche scroll karke \"Add to Home Screen\" dabao",
+    "s3": "Upar-right \"Add\" dabao. Ab ye app jaisa khulega!",
+    "ok": "Samajh gayi"
+  },
+  "explain": {
+    "trigger": { "t": "Trigger price", "d": "Woh price jahan pahunchte hi aapka order 'jaag' jata hai. Tab tak order sota rehta hai.", "e": "Trigger ₹1,850: price 1,850 tak gira tabhi order chalu hoga." },
+    "limit": { "t": "Limit price", "d": "Isse kharab price par order nahi hoga. Bechne mein: isse kam par nahi bikega.", "e": "Limit ₹1,845: ₹1,845 ya upar hi bikega, neeche nahi." },
+    "stoploss": { "t": "Stop-loss (SL)", "d": "Pehle se laga hua 'bachao' order. Price ek hadd se neeche gaya toh apne aap bech deta hai, taaki nuksaan chhota rahe.", "e": "₹1,900 ka share, SL ₹1,850: gira toh ~₹50 nuksaan pe nikal jaogi." },
+    "delivery": { "t": "Delivery vs Intraday", "d": "Delivery (CNC) = share aapke demat mein aata hai, jab tak chaho rakho. Intraday = usi din bechna padta hai.", "e": "Long-term ke liye hamesha Delivery chuno." },
+    "validity": { "t": "Validity: Day", "d": "Order sirf aaj ke liye. Aaj nahi hua toh shaam ko apne aap cancel.", "e": "Kal phir se lagana padega." },
+    "danger": { "t": "Khatre ka price", "d": "Aapka tay kiya hua level — isse neeche gaya toh ruk kar sochna hai: bechna hai ya rakhna.", "e": "LUPIN danger ₹1,960: iske neeche aaya toh Telegram alert." },
+    "pnl": { "t": "P&L", "d": "Profit and Loss — kitna faayda ya nuksaan. Abhi bechne par jo hota, woh.", "e": "₹100 mein liya, abhi ₹110 = +₹10 P&L." },
+    "avg": { "t": "Avg price", "d": "Aapne ek share average kitne mein liya. Alag-alag din kharida toh sabka average.", "e": "10 @ ₹100 + 10 @ ₹120 = avg ₹110." },
+    "stcg": { "t": "STCG / LTCG", "d": "Share bechne ke faayde pe tax. 1 saal se kam rakha = short-term (STCG), zyada = long-term (LTCG, kam tax).", "e": "Short-term: 1 saal se kam. Long-term: 1 saal se zyada." },
+    "gmp": { "t": "GMP", "d": "Grey Market Premium — IPO list hone se pehle ka unofficial andaza. Guarantee nahi hai.", "e": "Issue ₹100, GMP ₹20 = log ~₹120 listing soch rahe hain." },
+    "green": { "t": "Green hone ke liye % kyun zyada?", "d": "20% gire toh wapas aane ke liye 25% chadhna padta hai, kyunki ab chhote amount pe % lagta hai.", "e": "₹100 → ₹80 (−20%). ₹80 → ₹100 = +25%." },
+    "daymove": { "t": "Aaj ka change", "d": "Kal band hone ke price se aaj kitna upar-neeche hua.", "e": "Kal ₹100 pe band, aaj ₹102 = +2%." }
+  }
+}

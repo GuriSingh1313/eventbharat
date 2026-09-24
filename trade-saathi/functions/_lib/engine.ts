@@ -39,7 +39,9 @@ export async function runAlerts(env: Env, now = new Date(), opts: { force?: bool
   const toSend: Fired[] = [];
 
   if (p.minutes <= CLOSE_MIN + 5 || opts.force) {
-    const fired = evaluateRules(rules.map((r) => ({ ...r, active: !!r.active })), quotes, holdings.length ? port : null);
+    // Only judge 'portfolio green' when every holding has a live price (missing price = cost fallback, not real).
+    const allQuoted = holdings.length > 0 && holdings.every((h) => quotes[h.symbol]);
+    const fired = evaluateRules(rules.map((r) => ({ ...r, active: !!r.active })), quotes, allQuoted ? port : null);
     toSend.push(...fired);
   }
   if (p.minutes >= SUMMARY_MIN || opts.force) {
@@ -67,6 +69,6 @@ function summaryText(holdings: HoldingRow[], quotes: Record<string, QuoteOut>, p
       return `• ${h.symbol} ${inr(q.ltp)} (aaj ${pct(c.dayPct)}) · P&L ${inr(c.pnl, { sign: true })}`;
     })
     .join('\n');
-  const green = port.neededForGreenPct > 0 ? `Green hone ke liye ${port.neededForGreenPct.toFixed(1)}% aur chahiye.` : 'Portfolio green hai 🟢';
+  const green = holdings.some((h) => !quotes[h.symbol]) ? 'Kuch stocks ka price nahi mila — total adhoora hai.' : port.neededForGreenPct > 0 ? `Green hone ke liye ${port.neededForGreenPct.toFixed(1)}% aur chahiye.` : 'Portfolio green hai 🟢';
   return `📊 Aaj ka haal (${istTime(now)} IST)\n\nAaj: ${inr(port.dayChange, { sign: true })} (${pct(port.dayPct)})\nKul P&L: ${inr(port.pnl, { sign: true })} (${pct(port.pnlPct)})\nValue: ${inr(port.value)} / Lagaya: ${inr(port.invested)}\n${green}\n\n${lines}\n\nData thoda late ho sakta hai. Salah nahi, sirf jaankari.`;
 }
