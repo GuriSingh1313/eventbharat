@@ -1,6 +1,6 @@
 import { createContext, type ComponentChildren } from 'preact';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'preact/hooks';
-import { get, type Holding, type Quote } from './api';
+import { get, LOCAL, post, type Holding, type Quote } from './api';
 import { holdingCalc, portfolioCalc, type HoldingCalc, type PortfolioCalc } from './lib/money';
 
 export interface Row { h: Holding; q: Quote | undefined; c: HoldingCalc }
@@ -17,6 +17,8 @@ interface State {
   missing: string[];
   refresh: () => Promise<void>;
 }
+
+let lastAlertRun = 0;
 
 const Ctx = createContext<State | null>(null);
 
@@ -45,6 +47,11 @@ export function DataProvider({ children }: { children: ComponentChildren }) {
         off = off || q.offline;
       }
       setOffline(off);
+      // On-device mode has no server cron: check alerts whenever fresh prices arrive (at most every 5 min).
+      if (LOCAL && !off && Date.now() - lastAlertRun > 5 * 60_000) {
+        lastAlertRun = Date.now();
+        void post('/api/alerts/run').catch(() => {});
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {

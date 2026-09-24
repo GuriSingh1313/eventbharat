@@ -27,7 +27,22 @@ function writeCache(path: string, data: unknown): void {
 export let onUnauthorized: () => void = () => {};
 export function setUnauthorizedHandler(fn: () => void) { onUnauthorized = fn; }
 
+/** Zero-setup build: data lives on this device instead of Cloudflare D1. */
+export const LOCAL = import.meta.env.VITE_BACKEND === 'local';
+
 async function raw<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (LOCAL) {
+    const { localApi, HttpError } = await import('./local/backend');
+    try {
+      return (await localApi(method, path, body)) as T;
+    } catch (e) {
+      if (e instanceof HttpError) {
+        if (e.status === 401 && !path.startsWith('/api/auth/')) onUnauthorized();
+        throw new ApiError(e.message, e.status);
+      }
+      throw e;
+    }
+  }
   const r = await fetch(path, {
     method,
     credentials: 'same-origin',

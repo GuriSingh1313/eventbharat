@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { del, get, post, put, type AlertRow } from '../api';
+import { del, get, LOCAL, post, put, type AlertRow } from '../api';
 import { SymbolSearch } from '../components/SymbolSearch';
 import { TelegramWizard } from '../components/TelegramWizard';
 import { Banner, Explain, Field, Sheet, tap, toast } from '../components/ui';
@@ -62,6 +62,7 @@ export function Alerts() {
         <button class="btn-ghost" onClick={checkNow}>{t('alerts.checkNow')}</button>
       </div>
       <p class="text-sm text-mute mb-3 px-1">🕞 {t('alerts.summaryNote')}</p>
+      {LOCAL && <div class="mb-3"><Banner kind="info">ℹ️ {t('alerts.localNote')}</Banner></div>}
       {alerts.length === 0 ? <p class="card p-6 text-center text-mute">{t('alerts.empty')}</p> : (
         <ul class="card divide-y divide-line">
           {alerts.map((a) => (

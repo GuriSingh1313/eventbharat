@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { del, get, post, put } from '../api';
+import { del, get, LOCAL, post, put } from '../api';
 import { InstallGuide } from '../components/InstallGuide';
 import { TelegramWizard } from '../components/TelegramWizard';
 import { Field, Segmented, Sheet, toast } from '../components/ui';
@@ -82,6 +82,7 @@ export function Settings({ onLogout }: { onLogout: () => void }) {
 
       <section class="card p-4 mb-4">
         <h2 class="font-semibold mb-2">💾 {t('settings.backup')}</h2>
+        {LOCAL && <p class="text-[15px] mb-3">{t('settings.localData')}</p>}
         <button class="btn-ghost w-full mb-2" onClick={exportAll}>{t('settings.export')}</button>
         <label class="btn-ghost w-full flex items-center justify-center cursor-pointer">{t('settings.importJson')}
           <input type="file" accept="application/json,.json" class="sr-only" onChange={(e) => importAll(e.currentTarget.files?.[0])} /></label>

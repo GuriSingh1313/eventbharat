@@ -1,5 +1,25 @@
 # Trade Saathi — Setup Guide (sirf iPhone + Safari se) 📱
 
+## ⚡ Sabse aasaan tareeka — koi setup nahi (abhi yahi use karo)
+
+App already online hai aapki Vercel site par: **`<aapki-eventbharat-site>/trade-saathi/`**
+(jaise `https://eventbharat.vercel.app/trade-saathi/`)
+
+1. iPhone Safari mein ye link kholo.
+2. PIN banao (4–6 number) → dobara daalo → **Kholo**. Aapke 5 stocks pehle se bhare hain.
+3. Neeche **Share (⬆️)** → **Add to Home Screen** → **Add**.
+4. **Ab hamesha Home Screen wale icon se hi kholo.** (Safari aur Home Screen app ka data iPhone alag-alag rakhta hai.)
+5. Telegram chahiye toh: app mein **Alerts → ✈️ Telegram setup**.
+
+**Is version mein:** data sirf aapke phone mein save hota hai (server pe nahi), live prices aate hain, Telegram alert tab jaata hai jab app khuli ho.
+**Settings → Backup** se hafte mein ek baar data download kar lena.
+
+Har 15 minute wale automatic alerts (app band hone par bhi) chahiye toh neeche wala **Cloudflare setup** ek baar karna padega. Data Settings → Backup se wahan le ja sakte ho.
+
+---
+
+## 🛠️ Poora setup (Cloudflare) — optional, background alerts ke liye
+
 Total time: lagbhag **30–40 minute**, sirf ek baar. Sab kuch **free** hai, credit card nahi chahiye.
 Har step mein ek hi kaam hai. ✅ = "ye dikhna chahiye".
 
@@ -129,6 +149,7 @@ Ab se Mon–Fri har 15 minute (9:15 AM – 3:35 PM) alerts check honge, aur roz 
 ```bash
 cd trade-saathi
 npm install
+npm run build:vercel               # on-device build → ../public/trade-saathi (Vercel serves it at /trade-saathi/)
 npm run db:migrate:local && npm run db:seed:local
 npm run build && npm run pages:dev   # http://localhost:8788
 npm test                             # unit tests (money maths, order card, alerts dedupe, CSV)

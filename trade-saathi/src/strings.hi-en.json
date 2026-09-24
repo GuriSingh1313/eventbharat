@@ -51,7 +51,8 @@
     "value": "Price (₹)", "valuePct": "Kitna % move", "label": "Note (jaise Part 1 of 3)",
     "empty": "Koi alert nahi.", "off": "Band", "on": "Chalu",
     "telegram": "Telegram setup", "telegramOk": "Telegram jud gaya ✓", "telegramNo": "Telegram abhi juda nahi — alerts phone pe nahi aayenge",
-    "history": "Haal ke alerts", "checkNow": "Abhi check karo (test)", "summaryNote": "Roz 3:35 PM ko din ka summary Telegram pe aayega."
+    "history": "Haal ke alerts", "checkNow": "Abhi check karo (test)", "localNote": "Is version mein alerts tab check hote hain jab app khuli ho (har 5 minute). App band ho toh Telegram alert nahi aayega — din mein 2-3 baar app khol lena.",
+    "summaryNote": "Roz 3:35 PM ko din ka summary Telegram pe aayega."
   },
   "tg": {
     "s1t": "Bot banao", "s1": "Telegram kholo → search mein \"BotFather\" likho (blue tick wala) → \"Start\" dabao → /newbot bhejo → naam do (jaise Guri Trade Saathi) → username do jo \"bot\" pe khatam ho.",
@@ -69,7 +70,8 @@
     "backup": "Backup", "export": "Sara data download karo (JSON)", "importJson": "Backup file se wapas laao", "restored": "Data wapas aa gaya ✓",
     "install": "Home Screen pe kaise lagaye", "logout": "Logout",
     "about": "About", "aboutText": "Trade Saathi ek personal tool hai. Ye koi investment advice nahi hai, na hi SEBI registered advisor. Ye kabhi order nahi lagata aur broker login nahi maangta. Prices Yahoo Finance se aate hain aur late ho sakte hain. Faisla hamesha aapka.",
-    "version": "Version {v}"
+    "version": "Version {v}",
+    "localData": "📱 Aapka saara data sirf is phone mein save hai (kisi server pe nahi). Hafte mein ek baar \"Sara data download karo\" se backup le lo."
   },
   "install": {
     "title": "Trade Saathi ko Home Screen pe lagao",
