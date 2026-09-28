@@ -1,3 +1,11 @@
+# EventBharat
+
+- `/` — EventBharat event booking demo
+- `/trade-saathi/` — Trade Saathi
+- `/dukaan/` — **Dukaan Saathi**, chhoti dukaan ka AI chat bot (setup: [DUKAAN.md](DUKAAN.md))
+
+---
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
