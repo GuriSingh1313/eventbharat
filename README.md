@@ -4,6 +4,7 @@
 - `/trade-saathi/` — Trade Saathi
 - `/dukaan/` — **Dukaan Saathi**, chhoti dukaan ka AI chat bot (setup: [DUKAAN.md](DUKAAN.md))
 - `/khoj/` — **Client Khoj**, LinkedIn pe client dhoondhne ka assistant (setup: [KHOJ.md](KHOJ.md))
+- `/work/` — portfolio page (clients ko bhejne wala link)
 
 ---
 

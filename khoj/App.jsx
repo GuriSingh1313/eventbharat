@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { FILTERS, STATUSES, daysSince, findDuplicate, isFollowUpDue, makeLead, markFollowedUp, markSent, sentToday, workOrder } from './lib/leads.js'
 import { PERIODS, POST_PRESETS, googlePostsUrl, localPresets, peopleSearchUrl, postSearchUrl } from './lib/search.js'
+import { DAILY_STEPS, SETUP_STEPS, kitSections } from './lib/kit.js'
 
 const store = {
   get(key, fallback) {
@@ -107,6 +108,7 @@ export default function App() {
         <button className={tab === 'leads' ? 'on' : ''} onClick={() => setTab('leads')}>
           📋 Leads{todo > 0 && <span className="kh-badge">{todo}</span>}
         </button>
+        <button className={tab === 'kit' ? 'on' : ''} onClick={() => setTab('kit')}>🧰 Kit</button>
         <button className={tab === 'settings' ? 'on' : ''} onClick={() => setTab('settings')}>⚙️ Settings</button>
       </nav>
       {tab === 'find' && (
@@ -121,7 +123,18 @@ export default function App() {
         />
       )}
       {tab === 'leads' && <Leads leads={leads} me={me} now={now} onChange={saveLeads} toast={showToast} onFind={() => setTab('find')} />}
-      {tab === 'settings' && <Settings me={me} onSave={(m) => { saveMe(m); showToast('Save ho gaya ✅'); setTab('find') }} leads={leads} onLeads={saveLeads} onLogout={logout} toast={showToast} />}
+      {tab === 'kit' && <Kit me={me} toast={showToast} />}
+      {tab === 'settings' && (
+        <Settings
+          me={me}
+          // First save goes to the Kit's one-time setup checklist; later saves go back to searching.
+          onSave={(m) => { const first = !me.name; saveMe(m); showToast('Save ho gaya ✅'); setTab(first ? 'kit' : 'find') }}
+          leads={leads}
+          onLeads={saveLeads}
+          onLogout={logout}
+          toast={showToast}
+        />
+      )}
     </div>
   )
 }
@@ -160,7 +173,7 @@ function CodeGate({ onOk }) {
 async function copyText(text, toast) {
   try {
     await navigator.clipboard.writeText(text)
-    toast('Copy ho gaya 📋 LinkedIn pe paste karo')
+    toast('Copy ho gaya 📋 Ab paste karo')
   } catch {
     prompt('Copy karo:', text)
   }
@@ -368,6 +381,58 @@ function LeadCard({ lead, now, open, onToggle, onChange, onDelete, toast }) {
         </div>
       )}
     </article>
+  )
+}
+
+// ---------- KIT ----------
+
+function Kit({ me, toast }) {
+  const [done, setDone] = useState(() => store.get('khoj_kit_done', {}))
+  const toggle = (id) => {
+    const next = { ...done, [id]: !done[id] }
+    setDone(next)
+    store.set('khoj_kit_done', next)
+  }
+  const finished = SETUP_STEPS.filter((s) => done[s.id]).length
+  return (
+    <main className="kh-main">
+      <section className="kh-card">
+        <h2>Ek baar ka setup ({finished}/{SETUP_STEPS.length})</h2>
+        <p className="kh-help">Bas itna karna hai. Har kaam ke baad ✔ lagao. Text neeche Copy buttons mein tayyar hai.</p>
+        {SETUP_STEPS.map((s) => (
+          <label key={s.id} className={`kh-check ${done[s.id] ? 'done' : ''}`}>
+            <input type="checkbox" checked={!!done[s.id]} onChange={() => toggle(s.id)} />
+            <span>{s.text}</span>
+          </label>
+        ))}
+        <div className="kh-actions">
+          <a className="kh-btn ghost small" href="/work/" target="_blank" rel="noreferrer">👀 Mera portfolio</a>
+          <a className="kh-btn ghost small" href="/dukaan/?shop=sharma-dhaba" target="_blank" rel="noreferrer">💬 Demo bot</a>
+        </div>
+      </section>
+
+      <section className="kh-card">
+        <h2>Roz ka kaam (30-40 minute)</h2>
+        <ol className="kh-daily">{DAILY_STEPS.map((t) => <li key={t}>{t}</li>)}</ol>
+      </section>
+
+      {kitSections(me.name || 'Guri', location.origin).map((sec) => (
+        <section className="kh-card" key={sec.title}>
+          <h2>{sec.title}</h2>
+          <p className="kh-help">{sec.help}</p>
+          {sec.items.map((it) => (
+            <div className="kh-draft" key={it.label}>
+              <div className="kh-draft-head">
+                <span>{it.label}</span>
+                {it.max && <small>{it.text.length}/{it.max}</small>}
+              </div>
+              <p className="kh-kit-text">{it.text}</p>
+              <button className="kh-btn small" onClick={() => copyText(it.text, toast)}>📋 Copy</button>
+            </div>
+          ))}
+        </section>
+      ))}
+    </main>
   )
 }
 
