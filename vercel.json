@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/dukaan-chat.js": { "maxDuration": 60 },
+    "api/lead-draft.js": { "maxDuration": 60 }
+  }
+}
