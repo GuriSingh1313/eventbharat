@@ -6,10 +6,11 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rolldownOptions: {
-      // Two pages: EventBharat at / and Dukaan Saathi at /dukaan/
+      // EventBharat at /, Dukaan Saathi at /dukaan/, Client Khoj at /khoj/
       input: {
         main: 'index.html',
         dukaan: 'dukaan/index.html',
+        khoj: 'khoj/index.html',
       },
     },
   },
