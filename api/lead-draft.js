@@ -1,7 +1,10 @@
-// Client Khoj (Vercel serverless): POST { code, me, lead } -> { draft }; POST { code, check: true } -> { ok }.
+// Client Khoj (Vercel serverless):
+//   POST { code, me, lead, source }          -> { draft }   (verdict, drafts, personal demo profile)
+//   POST { code, me, lead, mode: 'reply', reply } -> { coach } (next message for a client's reply)
+//   POST { code, check: true }               -> { ok }
 // Env: ANTHROPIC_API_KEY and LEADS_CODE (required), LEADS_MODEL (optional). Guide: KHOJ.md.
 import Anthropic from '@anthropic-ai/sdk'
-import { DEFAULT_MODEL, DraftError, codeMatches, draftLead, parseDraftRequest } from './_leads/draft.js'
+import { DEFAULT_MODEL, DraftError, codeMatches, draftLead, parseDraftRequest, replyLead } from './_leads/draft.js'
 
 // Best-effort per-IP limit inside one warm instance; the Anthropic Console spend limit is the real cap.
 const WINDOW_MS = 60_000
@@ -35,8 +38,9 @@ export default async function handler(req, res) {
   if (parsed.error) return res.status(parsed.status).json({ error: parsed.error })
 
   try {
-    const draft = await draftLead({ client: getClient(), model: process.env.LEADS_MODEL || DEFAULT_MODEL, ...parsed })
-    return res.status(200).json({ draft })
+    const args = { client: getClient(), model: process.env.LEADS_MODEL || DEFAULT_MODEL, ...parsed }
+    if (parsed.mode === 'reply') return res.status(200).json({ coach: await replyLead(args) })
+    return res.status(200).json({ draft: await draftLead(args) })
   } catch (err) {
     if (err instanceof DraftError) return res.status(422).json({ error: err.message })
     if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError) {

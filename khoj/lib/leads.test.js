@@ -1,7 +1,7 @@
 // Run: npm test
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { FILTERS, findDuplicate, isFollowUpDue, makeLead, markFollowedUp, markSent, sentToday, workOrder } from './leads.js'
+import { FILTERS, addToThread, findDuplicate, isFollowUpDue, makeLead, markFollowedUp, markSent, sentToday, workOrder } from './leads.js'
 import { googlePostsUrl, peopleSearchUrl, postSearchUrl } from './search.js'
 
 const DAY = 86_400_000
@@ -33,6 +33,14 @@ test('follow-ups come due after 3 days, at most twice, and stop on reply', () =>
   assert.equal(isFollowUpDue(replied, T0 + 10 * DAY), false)
   // marking sent twice keeps the first send time
   assert.equal(markSent(markSent(makeLead(draft('hot'), {}, T0), T0), T0 + DAY).sentAt, T0)
+})
+
+test('marking sent starts the conversation thread with the message', () => {
+  const l = markSent(makeLead(draft('hot', { message: 'Hi, here is your demo' }), {}, T0), T0)
+  assert.deepEqual(l.thread, [{ from: 'me', text: 'Hi, here is your demo', at: T0 }])
+  assert.equal(markSent(l, T0 + 1).thread.length, 1)
+  const older = { ...makeLead(draft('hot'), {}, T0), thread: undefined }
+  assert.equal(addToThread(older, 'them', 'hey', T0).thread.length, 1)
 })
 
 test('sentToday counts first messages and follow-ups sent today', () => {

@@ -17,8 +17,10 @@ export function makeLead(draft, input, now = Date.now()) {
   return {
     id: `${now.toString(36)}${Math.random().toString(36).slice(2, 6)}`,
     createdAt: now,
+    source: draft.source ?? 'linkedin',
     url: input.url ?? '',
     text: (input.text ?? '').slice(0, 1500),
+    demoLink: draft.demoLink ?? '',
     person: draft.person,
     headline: draft.headline,
     need: draft.need,
@@ -33,12 +35,19 @@ export function makeLead(draft, input, now = Date.now()) {
     status: 'new',
     sentAt: null,
     followUpAts: [],
+    thread: [],
     notes: '',
   }
 }
 
+// The conversation so far, used by the reply coach. Older saved leads have no thread yet.
+export function addToThread(lead, from, text, now = Date.now()) {
+  return { ...lead, thread: [...(lead.thread ?? []), { from, text, at: now }].slice(-20) }
+}
+
 export function markSent(lead, now = Date.now()) {
-  return { ...lead, status: 'sent', sentAt: lead.sentAt ?? now }
+  const sent = { ...lead, status: 'sent', sentAt: lead.sentAt ?? now }
+  return (lead.thread ?? []).length || !lead.drafts.message ? sent : addToThread(sent, 'me', lead.drafts.message, now)
 }
 
 export function markFollowedUp(lead, now = Date.now()) {

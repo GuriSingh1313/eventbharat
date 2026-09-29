@@ -1,14 +1,17 @@
 // ============================================
-// Client Khoj - LinkedIn par client dhoondhne ka assistant
-// Search links open LinkedIn; you paste a post, AI checks the lead and drafts messages,
-// you send them yourself, and the tracker reminds you about follow-ups.
+// Client Khoj - LinkedIn / Upwork par client dhoondhne ka assistant
+// Paste a post: AI checks the lead, builds a personal demo of their business and drafts the messages.
+// You send them yourself; the tracker handles follow-ups and the reply coach writes the next message.
 // Nothing here logs in to LinkedIn or sends anything on its own.
 // ============================================
 
 import { useEffect, useState } from 'react'
-import { FILTERS, STATUSES, daysSince, findDuplicate, isFollowUpDue, makeLead, markFollowedUp, markSent, sentToday, workOrder } from './lib/leads.js'
-import { PERIODS, POST_PRESETS, googlePostsUrl, localPresets, peopleSearchUrl, postSearchUrl } from './lib/search.js'
-import { DAILY_STEPS, SETUP_STEPS, kitSections } from './lib/kit.js'
+import { FILTERS, STATUSES, addToThread, daysSince, findDuplicate, isFollowUpDue, makeLead, markFollowedUp, markSent, sentToday, workOrder } from './lib/leads.js'
+import { PERIODS, POST_PRESETS, SIGNAL_PRESETS, UPWORK_PRESETS, googlePostsUrl, localPresets, peopleSearchUrl, postSearchUrl, upworkSearchUrl } from './lib/search.js'
+import { SOURCES, applyDemoLink, buildClaudeAppPrompt, buildProjectBrief } from './lib/prompt.js'
+import { demoProfile } from './lib/demo.js'
+import { demoLink } from '../dukaan/lib/link.js'
+import { DAILY_STEPS, RULES, SETUP_STEPS, kitSections } from './lib/kit.js'
 
 const store = {
   get(key, fallback) {
@@ -39,12 +42,24 @@ const DEFAULT_ME = {
 }
 
 const FIT = { hot: '🔥 Hot', warm: '🙂 Warm', cold: '🧊 Cold' }
-const DRAFT_FIELDS = [
-  ['connection_note', 'Connection note', 300],
-  ['message', 'Message (connect hone ke baad)', 700],
-  ['comment', 'Post pe comment', 300],
-  ['follow_up', 'Follow-up (3 din baad)', 300],
-]
+// Which drafts to show per source, main one first: [key, label, max characters]. The message max leaves room for the demo link.
+const DRAFT_FIELDS = {
+  linkedin: [
+    ['message', 'Message (connect hone ke baad) · demo link isme hai', 2500],
+    ['connection_note', 'Connection note (sirf hot lead ke liye)', 200],
+    ['comment', 'Post pe comment (pehle ye karo)', 300],
+    ['follow_up', 'Follow-up (3 din baad)', 300],
+  ],
+  upwork: [
+    ['message', 'Proposal', 2500],
+    ['follow_up', 'Follow-up (2 din baad)', 300],
+  ],
+  other: [
+    ['message', 'Message', 2500],
+    ['comment', 'Comment', 300],
+    ['follow_up', 'Follow-up (3 din baad)', 300],
+  ],
+}
 
 // Current time, refreshed every minute so "aaj" counts and follow-up reminders stay current.
 function useNow() {
@@ -122,7 +137,7 @@ export default function App() {
           toast={showToast}
         />
       )}
-      {tab === 'leads' && <Leads leads={leads} me={me} now={now} onChange={saveLeads} toast={showToast} onFind={() => setTab('find')} />}
+      {tab === 'leads' && <Leads leads={leads} me={me} code={code} now={now} onChange={saveLeads} onBadCode={logout} toast={showToast} onFind={() => setTab('find')} />}
       {tab === 'kit' && <Kit me={me} toast={showToast} />}
       {tab === 'settings' && (
         <Settings
@@ -199,7 +214,10 @@ function Find({ me, code, leads, onSave, onBadCode, onSettings, toast }) {
     setResult(null)
     try {
       const { draft } = await api({ code, me, lead: { text, url: url.trim() } })
-      setResult(draft)
+      // Business lead: build its personal demo and put the link into the drafts.
+      const profile = demoProfile(draft.demo, me.language)
+      const link = profile ? await demoLink(profile) : ''
+      setResult({ ...applyDemoLink(draft, link), demoLink: link, demoName: profile?.name ?? '' })
     } catch (err) {
       if (err.status === 401) return onBadCode()
       setError(err.message)
@@ -219,55 +237,64 @@ function Find({ me, code, leads, onSave, onBadCode, onSettings, toast }) {
 
   return (
     <main className="kh-main">
-      <section className="kh-card">
-        <h2>1. LinkedIn pe dhoondho</h2>
-        <div className="kh-chips" role="group" aria-label="Kab ki posts">
-          {Object.entries(PERIODS).map(([k, v]) => (
-            <button key={k} className={period === k ? 'on' : ''} onClick={() => setPeriod(k)}>{v}</button>
-          ))}
-        </div>
-        <p className="kh-label">Jo abhi developer dhoondh rahe hain (posts)</p>
-        <div className="kh-links">
-          {POST_PRESETS.map((p) => <a key={p.label} href={postSearchUrl(p.q, period)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
-        </div>
-        <p className="kh-label">Business owners · {me.city} (log)</p>
-        <div className="kh-links">
-          {localPresets(me.city).map((p) => <a key={p.label} href={peopleSearchUrl(p.q)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
-        </div>
-        <div className="kh-row">
-          <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder='Apna search, jaise "need a chatbot"' aria-label="Apna search" />
-        </div>
-        {custom.trim() && (
-          <div className="kh-links">
-            <a href={postSearchUrl(custom.trim(), period)} target="_blank" rel="noreferrer">Posts ↗</a>
-            <a href={peopleSearchUrl(custom.trim())} target="_blank" rel="noreferrer">Log ↗</a>
-            <a href={googlePostsUrl(custom.trim(), period)} target="_blank" rel="noreferrer">Google se ↗</a>
-          </div>
-        )}
-      </section>
-
       <form className="kh-card" onSubmit={draft}>
-        <h2>2. Kaam ki post mili? Yahan paste karo</h2>
-        <p className="kh-help">LinkedIn pe post ya profile ka text copy karo (naam, headline, post). Link bhi daal do taaki baad mein seedha khul sake.</p>
-        <label>Link (optional)<input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://www.linkedin.com/posts/…" inputMode="url" /></label>
+        <h2>Post ya job yahan paste karo</h2>
+        <p className="kh-help">LinkedIn post / profile, Upwork job, kuch bhi. AI batayega kaam ka hai ya nahi, uske business ka demo banayega, aur message likh dega.</p>
+        <textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} maxLength={4000} aria-label="Post / profile ka text"
+          placeholder={'Simran Kaur · Owner, Sweet Crumbs Bakery\nLooking for someone to build a WhatsApp ordering bot…'} />
+        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="Link (optional)" inputMode="url" aria-label="Link (optional)" />
         {duplicate && <p className="kh-warn">⚠️ Ye lead pehle se save hai ({STATUSES[duplicate.status].label}).</p>}
-        <label>Post / profile ka text<textarea rows={7} value={text} onChange={(e) => setText(e.target.value)} maxLength={4000} placeholder="Simran Kaur · Owner, Sweet Crumbs Bakery&#10;Looking for someone to build a WhatsApp ordering bot…" /></label>
         {!me.name && <p className="kh-warn">Pehle <button type="button" className="kh-link" onClick={onSettings}>Settings</button> mein apna naam bharo.</p>}
-        <button className="kh-btn wide" disabled={busy || text.trim().length < 20 || !me.name}>{busy ? '🤖 Soch raha hai…' : '🤖 Check karo + message likho'}</button>
+        <button className="kh-btn wide big" disabled={busy || text.trim().length < 20 || !me.name}>{busy ? '🤖 Demo + message ban raha hai…' : '🤖 Demo + message banao'}</button>
         {error && <p className="kh-error">⚠️ {error}</p>}
+        <button type="button" className="kh-link small" disabled={text.trim().length < 20}
+          onClick={() => copyText(buildClaudeAppPrompt(me, { text, url: url.trim() }), toast)}>
+          Paise nahi lagane? Claude app ke liye copy karo (demo nahi banega)
+        </button>
       </form>
 
       {result && (
         <section className="kh-card kh-result">
           <LeadSummary lead={result} />
-          <Drafts drafts={result} onChange={(key, v) => setResult({ ...result, [key]: v })} toast={toast} />
+          {result.demoLink && <DemoCard name={result.demoName} link={result.demoLink} toast={toast} />}
+          <Drafts source={result.source} drafts={result} onChange={(key, v) => setResult({ ...result, [key]: v })} toast={toast} />
           <div className="kh-actions">
             <button className="kh-btn" onClick={() => save(true)}>✅ Bhej diya · save</button>
-            <button className="kh-btn ghost" onClick={() => save(false)}>💾 Baad mein bhejunga</button>
+            <button className="kh-btn ghost" onClick={() => save(false)}>💾 Baad mein</button>
             <button className="kh-btn ghost" onClick={() => setResult(null)}>✖️ Chhodo</button>
           </div>
         </section>
       )}
+
+      <details className="kh-card kh-find">
+        <summary>🔍 Leads kahan milenge? (search buttons)</summary>
+        <div className="kh-chips" role="group" aria-label="Kab ki posts">
+          {Object.entries(PERIODS).map(([k, v]) => (
+            <button key={k} type="button" className={period === k ? 'on' : ''} onClick={() => setPeriod(k)}>{v}</button>
+          ))}
+        </div>
+        <p className="kh-label">LinkedIn: jinhe abhi chahiye</p>
+        <div className="kh-links">
+          {POST_PRESETS.map((p) => <a key={p.label} href={postSearchUrl(p.q, period)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
+        </div>
+        <p className="kh-label">LinkedIn: chhupe hue leads (staff hire kar rahe hain)</p>
+        <div className="kh-links">
+          {SIGNAL_PRESETS.map((p) => <a key={p.label} href={postSearchUrl(p.q, period)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
+          {localPresets(me.city).map((p) => <a key={p.label} href={peopleSearchUrl(p.q)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
+        </div>
+        <p className="kh-label">Upwork: naye jobs</p>
+        <div className="kh-links">
+          {UPWORK_PRESETS.map((p) => <a key={p.label} href={upworkSearchUrl(p.q)} target="_blank" rel="noreferrer">{p.label} ↗</a>)}
+        </div>
+        <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder='Apna search, jaise "need a chatbot"' aria-label="Apna search" />
+        {custom.trim() && (
+          <div className="kh-links">
+            <a href={postSearchUrl(custom.trim(), period)} target="_blank" rel="noreferrer">LinkedIn posts ↗</a>
+            <a href={upworkSearchUrl(custom.trim())} target="_blank" rel="noreferrer">Upwork ↗</a>
+            <a href={googlePostsUrl(custom.trim(), period)} target="_blank" rel="noreferrer">Google se ↗</a>
+          </div>
+        )}
+      </details>
     </main>
   )
 }
@@ -278,6 +305,7 @@ function LeadSummary({ lead }) {
       <div className="kh-summary-top">
         <span className={`kh-fit ${lead.fit}`}>{FIT[lead.fit]}</span>
         <b>{lead.person || 'Naam nahi mila'}</b>
+        {lead.source && <small className="kh-source">{SOURCES[lead.source]?.label}</small>}
       </div>
       {lead.headline && <p className="kh-muted">{lead.headline}</p>}
       {lead.need && <p>🎯 {lead.need}</p>}
@@ -286,14 +314,28 @@ function LeadSummary({ lead }) {
   )
 }
 
-function Drafts({ drafts, onChange, toast, only }) {
-  return DRAFT_FIELDS.filter(([key]) => (only ? only.includes(key) : drafts[key])).map(([key, label, max]) => (
+function DemoCard({ name, link, toast }) {
+  return (
+    <div className="kh-demo">
+      <b>🎁 {name ? `${name} ka demo tayyar` : 'Personal demo tayyar'}</b>
+      <p>Iska link message mein daal diya hai. Bhejne se pehle ek baar khol ke dekh lo.</p>
+      <div className="kh-actions">
+        <a className="kh-btn small" href={link} target="_blank" rel="noreferrer">👀 Demo kholo</a>
+        <button className="kh-btn ghost small" onClick={() => copyText(link, toast)}>📋 Sirf link</button>
+      </div>
+    </div>
+  )
+}
+
+function Drafts({ source = 'linkedin', drafts, onChange, toast, only }) {
+  const fields = (DRAFT_FIELDS[source] ?? DRAFT_FIELDS.linkedin).filter(([key]) => (only ? only.includes(key) : drafts[key]))
+  return fields.map(([key, label, max]) => (
     <div key={key} className="kh-draft">
       <div className="kh-draft-head">
         <span>{label}</span>
         <small className={drafts[key].length > max ? 'over' : ''}>{drafts[key].length}/{max}</small>
       </div>
-      <textarea rows={key === 'message' ? 5 : 3} value={drafts[key]} onChange={(e) => onChange(key, e.target.value)} aria-label={label} />
+      <textarea rows={key === 'message' ? 6 : 3} value={drafts[key]} onChange={(e) => onChange(key, e.target.value)} aria-label={label} />
       <button className="kh-btn small" onClick={() => copyText(drafts[key], toast)}>📋 Copy</button>
     </div>
   ))
@@ -301,7 +343,7 @@ function Drafts({ drafts, onChange, toast, only }) {
 
 // ---------- LEADS ----------
 
-function Leads({ leads, me, now, onChange, toast, onFind }) {
+function Leads({ leads, me, code, now, onChange, onBadCode, toast, onFind }) {
   const [filter, setFilter] = useState('todo')
   const [open, setOpen] = useState(null)
   const shown = workOrder(leads, now).filter((l) => FILTERS[filter].test(l, now))
@@ -329,8 +371,8 @@ function Leads({ leads, me, now, onChange, toast, onFind }) {
         </div>
       )}
       {shown.map((l) => (
-        <LeadCard key={l.id} lead={l} now={now} open={open === l.id} onToggle={() => setOpen(open === l.id ? null : l.id)} onChange={update}
-          onDelete={() => confirm('Ye lead hata dein?') && onChange(leads.filter((x) => x.id !== l.id))} toast={toast} />
+        <LeadCard key={l.id} lead={l} me={me} code={code} now={now} open={open === l.id} onToggle={() => setOpen(open === l.id ? null : l.id)} onChange={update}
+          onBadCode={onBadCode} onDelete={() => confirm('Ye lead hata dein?') && onChange(leads.filter((x) => x.id !== l.id))} toast={toast} />
       ))}
       <p className="kh-help center">Leads sirf is phone mein save hain. Settings se backup le lo.</p>
     </main>
@@ -342,10 +384,12 @@ function ago(t, now) {
   return d <= 0 ? 'aaj' : d === 1 ? 'kal' : `${d} din pehle`
 }
 
-function LeadCard({ lead, now, open, onToggle, onChange, onDelete, toast }) {
+function LeadCard({ lead, me, code, now, open, onToggle, onChange, onBadCode, onDelete, toast }) {
   const due = isFollowUpDue(lead, now)
+  const talking = ['sent', 'replied', 'call'].includes(lead.status)
   const setDraft = (key, v) => onChange({ ...lead, drafts: { ...lead.drafts, [key]: v } })
   const when = lead.sentAt ? `${ago(lead.sentAt, now)} bheja` : `${ago(lead.createdAt, now)} mila`
+  const firstFields = lead.source === 'upwork' ? ['message'] : ['message', 'connection_note', 'comment']
   return (
     <article className={`kh-card kh-lead ${due ? 'due' : ''} ${lead.status === 'lost' ? 'dim' : ''}`}>
       <button className="kh-lead-head" onClick={onToggle} aria-expanded={open}>
@@ -362,25 +406,91 @@ function LeadCard({ lead, now, open, onToggle, onChange, onDelete, toast }) {
       {open && (
         <div className="kh-lead-body">
           {lead.need && <p>🎯 {lead.need}</p>}
-          {lead.url && <a className="kh-btn ghost small" href={lead.url} target="_blank" rel="noreferrer">🔗 LinkedIn pe kholo</a>}
-          <Drafts
-            drafts={lead.drafts}
-            onChange={setDraft}
-            toast={toast}
-            only={lead.status === 'new' ? ['connection_note', 'message', 'comment'].filter((k) => lead.drafts[k]) : ['follow_up', 'message']}
-          />
           <div className="kh-actions">
-            {lead.status === 'new' && <button className="kh-btn" onClick={() => onChange(markSent(lead))}>✅ Bhej diya</button>}
-            {due && <button className="kh-btn" onClick={() => onChange(markFollowedUp(lead))}>✅ Follow-up bhej diya</button>}
+            {lead.url && <a className="kh-btn ghost small" href={lead.url} target="_blank" rel="noreferrer">🔗 Post kholo</a>}
+            {lead.demoLink && <a className="kh-btn ghost small" href={lead.demoLink} target="_blank" rel="noreferrer">🎁 Demo kholo</a>}
+          </div>
+          {lead.status === 'new' && (
+            <>
+              <Drafts source={lead.source} drafts={lead.drafts} onChange={setDraft} toast={toast} only={firstFields.filter((k) => lead.drafts[k])} />
+              <button className="kh-btn" onClick={() => onChange(markSent(lead))}>✅ Bhej diya</button>
+            </>
+          )}
+          {due && (
+            <>
+              <Drafts source={lead.source} drafts={lead.drafts} onChange={setDraft} toast={toast} only={['follow_up']} />
+              <button className="kh-btn" onClick={() => onChange(markFollowedUp(lead))}>✅ Follow-up bhej diya</button>
+            </>
+          )}
+          {talking && <ReplyCoach lead={lead} me={me} code={code} onChange={onChange} onBadCode={onBadCode} toast={toast} />}
+          {lead.status === 'won' && (
+            <div className="kh-demo">
+              <b>🎉 Client mil gaya!</b>
+              <p>Ye brief copy karke Claude ko bhejo. Wo sawal poochega, price batayega aur kaam bana dega.</p>
+              <button className="kh-btn small" onClick={() => copyText(buildProjectBrief(lead, me), toast)}>📦 Claude ke liye brief copy karo</button>
+            </div>
+          )}
+          <details className="kh-more">
+            <summary>Aur (status, notes, hatao)</summary>
             <select value={lead.status} onChange={(e) => onChange({ ...lead, status: e.target.value, sentAt: lead.sentAt ?? (e.target.value !== 'new' ? Date.now() : null) })} aria-label="Status">
               {Object.entries(STATUSES).map(([k, s]) => <option key={k} value={k}>{s.emoji} {s.label}</option>)}
             </select>
-          </div>
-          <label className="kh-notes">Notes<textarea rows={2} value={lead.notes} onChange={(e) => onChange({ ...lead, notes: e.target.value })} placeholder="Budget, call ka time, kya bola…" /></label>
-          <button className="kh-link danger" onClick={onDelete}>🗑️ Hatao</button>
+            <label className="kh-notes">Notes<textarea rows={2} value={lead.notes} onChange={(e) => onChange({ ...lead, notes: e.target.value })} placeholder="Budget, call ka time, kya bola…" /></label>
+            <button className="kh-link danger" onClick={onDelete}>🗑️ Hatao</button>
+          </details>
         </div>
       )}
     </article>
+  )
+}
+
+// Paste the client's reply; AI writes the next message and says what to do next.
+function ReplyCoach({ lead, me, code, onChange, onBadCode, toast }) {
+  const [reply, setReply] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [coach, setCoach] = useState(null)
+
+  async function ask() {
+    setBusy(true)
+    setError('')
+    try {
+      const { coach } = await api({ code, me, mode: 'reply', reply, lead: { text: lead.text, person: lead.person, need: lead.need, thread: lead.thread ?? [] } })
+      setCoach(coach)
+    } catch (err) {
+      if (err.status === 401) return onBadCode()
+      setError(err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  function sent() {
+    let next = addToThread(lead, 'them', reply.trim())
+    next = addToThread(next, 'me', coach.reply)
+    onChange({ ...next, status: coach.status })
+    setCoach(null)
+    setReply('')
+    toast('Save ho gaya ✅')
+  }
+
+  return (
+    <div className="kh-coach">
+      <b>💬 Client ne reply kiya?</b>
+      <textarea rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Unka reply yahan paste karo" aria-label="Client ka reply" />
+      <button className="kh-btn small" disabled={busy || !reply.trim()} onClick={ask}>{busy ? '🤖 Soch raha hai…' : '🤖 Jawab likho'}</button>
+      {error && <p className="kh-error">⚠️ {error}</p>}
+      {coach && (
+        <>
+          <p className="kh-next">👉 {coach.next_step}</p>
+          <textarea rows={5} value={coach.reply} onChange={(e) => setCoach({ ...coach, reply: e.target.value })} aria-label="Mera jawab" />
+          <div className="kh-actions">
+            <button className="kh-btn small" onClick={() => copyText(coach.reply, toast)}>📋 Copy</button>
+            <button className="kh-btn ghost small" onClick={sent}>✅ Bhej diya ({STATUSES[coach.status].label})</button>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 
@@ -412,8 +522,13 @@ function Kit({ me, toast }) {
       </section>
 
       <section className="kh-card">
-        <h2>Roz ka kaam (30-40 minute)</h2>
+        <h2>Roz ka kaam (30 minute)</h2>
         <ol className="kh-daily">{DAILY_STEPS.map((t) => <li key={t}>{t}</li>)}</ol>
+      </section>
+
+      <section className="kh-card">
+        <h2>4 rules (account safe rahega)</h2>
+        <ul className="kh-daily">{RULES.map((t) => <li key={t}>{t}</li>)}</ul>
       </section>
 
       {kitSections(me.name || 'Guri', location.origin).map((sec) => (

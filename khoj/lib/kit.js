@@ -2,21 +2,29 @@
 // Honest by design: it says the work is AI-assisted and claims no experience or clients that don't exist yet.
 
 export const SETUP_STEPS = [
-  { id: 'keys', text: 'Vercel mein ANTHROPIC_API_KEY aur LEADS_CODE daale, GitHub pe PR merge kiya' },
-  { id: 'demo', text: 'Portfolio aur Dukaan demo khol ke dekha ki chal raha hai' },
+  { id: 'keys', text: 'Vercel mein keys daali aur GitHub pe PR merge kiya (ek baar)' },
+  { id: 'photo', text: 'LinkedIn: saaf, muskurati hui profile photo lagayi' },
   { id: 'li-headline', text: 'LinkedIn: headline badli (neeche se copy)' },
-  { id: 'li-about', text: 'LinkedIn: About section paste kiya' },
+  { id: 'li-about', text: 'LinkedIn: About paste kiya' },
   { id: 'li-featured', text: 'LinkedIn: Featured mein portfolio link joda' },
-  { id: 'up-profile', text: 'Upwork: account + title + overview + skills' },
-  { id: 'up-catalog', text: 'Upwork: 1 Project Catalog (chatbot wala) daala' },
-  { id: 'fiverr', text: 'Fiverr: 1 gig daala (optional)' },
+  { id: 'li-services', text: 'LinkedIn: "Open to → Providing services" on kiya (clients seedha request bhej sakte hain)' },
+  { id: 'warm', text: '20 jaan-pehchaan walon ko message bheja (neeche wala message)' },
+  { id: 'upwork', text: 'Upwork profile + 1 Project Catalog (optional)' },
 ]
 
 export const DAILY_STEPS = [
-  'Client Khoj → Dhoondho → 24 ghante → 3-4 search kholo, 10-15 message bhejo',
-  'Leads → Aaj ka kaam → follow-ups bhejo',
-  'Upwork → naye chatbot / AI jobs pe 2-3 proposal (neeche wala template)',
-  'Reply aaye to mujhe (Claude) chat mein bhejo, jawab saath mein likhenge',
+  '5 min: 5 business owners ki posts pe achha comment (2-3 line, madad wala, "nice post" nahi)',
+  '15 min: 5 post / job paste karo → "Demo + message banao" → bhejo',
+  '5 min: Leads → Aaj ka kaam → follow-ups',
+  'Reply aaye → lead kholo → reply paste → "Jawab likho"',
+  'Hafte mein 1 baar: ek demo ka screenshot + 3 line ki post (neeche template)',
+]
+
+export const RULES = [
+  'Connection request zyada tar bina note ke bhejo. Accept hone ke baad demo wala message bhejo.',
+  'Note sirf 🔥 hot lead ke liye (free account mein mahine ke kuch hi note milte hain).',
+  'Roz 15-20 se zyada request mat bhejo. Hafte mein ~100 ki limit hai, uske upar account ruk sakta hai.',
+  'Kisi bhi bot/extension se LinkedIn mat chalao. Sab khud bhejo.',
 ]
 
 export function kitSections(name, origin) {
@@ -28,7 +36,7 @@ export function kitSections(name, origin) {
       title: 'LinkedIn',
       help: 'Profile kholo → apne naam ke paas ✏️ → Headline. Phir About section mein ✏️. Featured mein "Add link" → portfolio link.',
       items: [
-        { label: 'Headline', max: 220, text: 'I build AI chatbots & small web apps for businesses | Customer assistants that answer questions and take orders | AI-assisted development, fast delivery' },
+        { label: 'Headline', max: 220, text: 'Freelance AI Chatbot & Web App Developer | I build assistants that answer your customers and take orders | Live demos below' },
         {
           label: 'About',
           max: 2600,
@@ -46,6 +54,24 @@ See my work and try the live demos: ${work}
 If your customers keep asking the same questions, or you lose orders after hours, message me. I'll show you a demo built on your own business details within 24 hours.`,
         },
         { label: 'Featured link', text: work },
+        {
+          label: 'Jaan-pehchaan walon ko message (20 logon ko)',
+          text: `Hi! Quick update: I've started building AI assistants for small businesses. They answer customers on a link (prices, timings, menu) and take orders or bookings 24x7.
+
+Here's a 1-minute demo: ${demo}
+
+Do you know a shop, clinic, restaurant or small business owner who could use this? An intro would mean a lot 🙏`,
+        },
+        {
+          label: 'Hafte ki post (template)',
+          text: `This week I built a demo AI assistant for a {kind of business} in {city}.
+
+It answers customer questions from their own menu and takes orders, then sends each order to the owner's phone. It took {time} to build.
+
+Try it yourself: {demo link}
+
+If your customers keep asking the same questions, I can build one for your business too.`,
+        },
       ],
     },
     {

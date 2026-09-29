@@ -3,12 +3,12 @@
 // so both sides clean a profile the same way. Pure JS, no browser or Node APIs.
 
 export const TYPES = {
-  restaurant: { label: 'Dhaba / Restaurant', emoji: '🍛', kind: 'order', catalogLabel: 'Menu (item - price)', quick: ['Menu dikhao', 'Aaj kya special hai?', 'Home delivery hoti hai?', 'Order karna hai'] },
-  kirana: { label: 'Kirana / General Store', emoji: '🛒', kind: 'order', catalogLabel: 'Saamaan (item - price)', quick: ['Kya kya milta hai?', 'Atta ka rate?', 'Delivery kab tak?', 'Order karna hai'] },
-  salon: { label: 'Salon / Parlour', emoji: '💇', kind: 'booking', catalogLabel: 'Services (service - price)', quick: ['Rate list bhejo', 'Aaj slot khali hai?', 'Bridal package?', 'Appointment book karo'] },
-  clinic: { label: 'Clinic / Doctor', emoji: '🩺', kind: 'booking', catalogLabel: 'Services / fees', quick: ['Doctor kab milenge?', 'Consultation fee?', 'Kal ka appointment', 'Address bhejo'] },
-  coaching: { label: 'Coaching / Tuition', emoji: '📚', kind: 'booking', catalogLabel: 'Courses (course - fees)', quick: ['Kaunse courses hain?', 'Fees kitni hai?', 'Demo class milegi?', 'Admission lena hai'] },
-  other: { label: 'Koi aur business', emoji: '🏪', kind: 'order', catalogLabel: 'Products / services (naam - price)', quick: ['Kya kya milta hai?', 'Rate batao', 'Timing kya hai?', 'Order karna hai'] },
+  restaurant: { label: 'Dhaba / Restaurant', emoji: '🍛', kind: 'order', catalogLabel: 'Menu (item - price)', quick: ['Menu dikhao', 'Aaj kya special hai?', 'Home delivery hoti hai?', 'Order karna hai'], quickEn: ['Show the menu', "What's special today?", 'Do you deliver?', 'I want to order'] },
+  kirana: { label: 'Kirana / General Store', emoji: '🛒', kind: 'order', catalogLabel: 'Saamaan (item - price)', quick: ['Kya kya milta hai?', 'Atta ka rate?', 'Delivery kab tak?', 'Order karna hai'], quickEn: ['What do you sell?', 'Price list please', 'How fast is delivery?', 'I want to order'] },
+  salon: { label: 'Salon / Parlour', emoji: '💇', kind: 'booking', catalogLabel: 'Services (service - price)', quick: ['Rate list bhejo', 'Aaj slot khali hai?', 'Bridal package?', 'Appointment book karo'], quickEn: ['Price list please', 'Any slot today?', 'Packages?', 'Book an appointment'] },
+  clinic: { label: 'Clinic / Doctor', emoji: '🩺', kind: 'booking', catalogLabel: 'Services / fees', quick: ['Doctor kab milenge?', 'Consultation fee?', 'Kal ka appointment', 'Address bhejo'], quickEn: ['When is the doctor in?', 'Consultation fee?', 'Book for tomorrow', 'Where are you?'] },
+  coaching: { label: 'Coaching / Tuition', emoji: '📚', kind: 'booking', catalogLabel: 'Courses (course - fees)', quick: ['Kaunse courses hain?', 'Fees kitni hai?', 'Demo class milegi?', 'Admission lena hai'], quickEn: ['Which courses?', 'What are the fees?', 'Free demo class?', 'I want to join'] },
+  other: { label: 'Koi aur business', emoji: '🏪', kind: 'order', catalogLabel: 'Products / services (naam - price)', quick: ['Kya kya milta hai?', 'Rate batao', 'Timing kya hai?', 'Order karna hai'], quickEn: ['What do you offer?', 'Prices please', 'What are your timings?', 'I want to order'] },
 }
 
 export const LANGUAGES = {

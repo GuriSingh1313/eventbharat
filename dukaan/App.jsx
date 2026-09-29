@@ -163,7 +163,7 @@ function Header({ profile }) {
       <div className="ds-avatar" aria-hidden="true">{t.emoji}</div>
       <div className="ds-title">
         <h1>{profile.name}</h1>
-        <p><span className="ds-dot" /> AI assistant · turant jawab</p>
+        <p><span className="ds-dot" /> AI assistant · {profile.language === 'english' ? 'instant replies' : 'turant jawab'}</p>
       </div>
       {tel.length >= 8 && <a className="ds-call" href={`tel:${tel}`} aria-label={`Call ${profile.name}`}>📞</a>}
     </header>
@@ -218,16 +218,20 @@ function Chat({ profile, shopId, demoCode, fromLink, onOrder, onSetup }) {
     send(msg.retry, messages.slice(0, Math.max(0, i - 1)))
   }
 
-  const quick = TYPES[profile.type].quick
+  // English demos (the ones sent to LinkedIn/Upwork clients) get English buttons and notes.
+  const english = profile.language === 'english'
+  const quick = english ? TYPES[profile.type].quickEn : TYPES[profile.type].quick
   return (
     <>
       <main className="ds-chat">
         {shopId && (
-          <div className="ds-note">🤖 Ye {profile.name} ka AI assistant hai. Kuch galat lage to dukaan pe call karein.</div>
+          <div className="ds-note">{english ? `🤖 This is ${profile.name}'s AI assistant. If anything looks wrong, please call the business.` : `🤖 Ye ${profile.name} ka AI assistant hai. Kuch galat lage to dukaan pe call karein.`}</div>
         )}
         {fromLink && !shopId && (
           <div className="ds-note">
-            👋 Ye <b>{profile.name}</b> ka AI assistant hai (demo). Customer ban ke kuch bhi poochiye - rate, timing, ya order karke dekhiye.
+            {english
+              ? <>👋 A demo AI assistant for <b>{profile.name}</b>. Chat as a customer: ask about prices or timings, or place a test order.</>
+              : <>👋 Ye <b>{profile.name}</b> ka AI assistant hai (demo). Customer ban ke kuch bhi poochiye - rate, timing, ya order karke dekhiye.</>}
           </div>
         )}
         {messages.map((m) => (
@@ -265,7 +269,7 @@ function Chat({ profile, shopId, demoCode, fromLink, onOrder, onSetup }) {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Message likhiye…"
+            placeholder={english ? 'Type a message…' : 'Message likhiye…'}
             maxLength={800}
             aria-label="Message"
             enterKeyHint="send"

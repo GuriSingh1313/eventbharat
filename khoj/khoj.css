@@ -238,6 +238,28 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--brand); out
 .kh-notes { margin-top: 2px; }
 .kh-empty { text-align: center; color: var(--muted); padding: 24px 12px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
 
+/* DEMO + COACH + MORE */
+.kh-btn.big { padding: 14px 16px; font-size: 16px; }
+.kh-link.small { font-size: 13px; font-weight: 500; }
+.kh-link:disabled { opacity: 0.45; }
+.kh-source { margin-left: auto; font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+.kh-demo, .kh-coach {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand);
+}
+.kh-demo p { font-size: 13.5px; color: var(--muted); }
+.kh-coach { background: var(--field); border-color: var(--line); }
+.kh-next { font-weight: 600; font-size: 14.5px; }
+.kh-find summary, .kh-more summary { font-weight: 700; cursor: pointer; }
+.kh-find[open] { gap: 10px; }
+.kh-more { display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.kh-more[open] summary { margin-bottom: 6px; }
+
 /* KIT */
 .kh-check { flex-direction: row; align-items: flex-start; gap: 10px; font-size: 14.5px; font-weight: 500; color: var(--text); }
 .kh-check input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; accent-color: var(--brand); }
