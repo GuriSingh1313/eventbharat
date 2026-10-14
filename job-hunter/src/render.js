@@ -21,6 +21,7 @@ h1{font-size:18pt;margin:0}h2{font-size:11pt;text-transform:uppercase;border-bot
 <div class="row"><b>${esc(e.title)} — ${esc(e.company)}</b><span class="c">${esc(e.start)} – ${esc(e.end)}</span></div>${list(e.bullets)}`).join('')}
 ${r.projects?.length ? `<h2>Projects</h2>${r.projects.map((p) => `<b>${esc(p.name)}</b>${list(p.bullets)}`).join('')}` : ''}
 <h2>Education</h2>${(r.education ?? []).map((e) => `<div class="row"><span>${esc(e.degree)}, ${esc(e.school)}</span><span class="c">${esc(e.year)}</span></div>`).join('')}
+${r.certifications?.length ? `<h2>Certifications</h2><div>${r.certifications.map(esc).join(' · ')}</div>` : ''}
 </body></html>`;
 }
 
