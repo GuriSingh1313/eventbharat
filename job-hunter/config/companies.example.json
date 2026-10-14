@@ -1,0 +1,12 @@
+{
+  "_comment": "Career pages hosted on public ATS boards. Slug = the part in the board URL, e.g. boards.greenhouse.io/<slug>, jobs.lever.co/<slug>, jobs.ashbyhq.com/<slug>.",
+  "greenhouse": ["razorpay", "groww", "postman"],
+  "lever": ["cred", "meesho"],
+  "ashby": ["zepto"],
+  "naukri": {
+    "queries": ["react developer", "full stack developer"],
+    "location": "bengaluru",
+    "experience": 4,
+    "pages": 2
+  }
+}

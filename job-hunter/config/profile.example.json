@@ -1,0 +1,27 @@
+{
+  "name": "Your Name",
+  "email": "you@example.com",
+  "phone": "+91-9999999999",
+  "location": "Bengaluru, India",
+  "links": { "linkedin": "https://linkedin.com/in/you", "github": "https://github.com/you" },
+  "summary": "Full-stack engineer with 4 years building React/Node products.",
+  "skills": ["JavaScript", "TypeScript", "React", "Node.js", "PostgreSQL", "AWS"],
+  "experience": [
+    {
+      "company": "Acme", "title": "Software Engineer", "start": "2022-01", "end": "Present",
+      "bullets": ["Built X used by 50k users", "Cut API latency 40% by ..."]
+    }
+  ],
+  "projects": [{ "name": "EventBharat", "bullets": ["Event discovery platform in React + Vite"] }],
+  "education": [{ "school": "XYZ University", "degree": "B.Tech CSE", "year": "2021" }],
+  "preferences": {
+    "keywords": ["frontend", "full stack", "react", "node"],
+    "excludeKeywords": ["intern", "principal", "director"],
+    "locations": ["bengaluru", "bangalore", "remote", "india", "gurgaon", "noida"],
+    "minScore": 60,
+    "maxApplicationsPerRun": 15,
+    "experienceYears": 4,
+    "expectedCtcLpa": 18,
+    "noticePeriodDays": 30
+  }
+}
